@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: "Cari kendaraan...",
+                hintText: "Cari Buku",
                 prefixIcon: const Icon(Icons.search, color: Colors.orange),
                 suffixIcon: _searchKeyword.isNotEmpty
                     ? IconButton(
@@ -120,9 +120,9 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(12),
               itemCount: filtered.length,
               itemBuilder: (context, idx) {
-                final BookstoreIndex = filtered[idx];
-                final vehicle = bookList[BookstoreIndex];
-                final liked = _favorite.contains(BookstoreIndex);
+                final BookstoreList = filtered[idx];
+                final vehicle = bookList[BookstoreList];
+                final liked = _favorite.contains(BookstoreList);
 
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 8),
@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> {
                         liked ? Icons.favorite : Icons.favorite_border,
                         color: liked ? Colors.red : Colors.grey,
                       ),
-                      onPressed: () => _toggleFavorite(BookstoreIndex),
+                      onPressed: () => _toggleFavorite(BookstoreList),
                     ),
                     // Klik → buka detail kendaraan
                     onTap: () {
@@ -154,7 +154,7 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                           builder: (c) =>
-                              DetailPage(Bookstore: bookList[BookstoreIndex]),
+                              DetailPage(Bookstore: bookList[BookstoreList]),
                         ),
                       );
                     },
