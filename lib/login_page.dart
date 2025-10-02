@@ -63,6 +63,17 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Gambar header (pastikan file assets/images/header.png ada dan terdaftar di pubspec.yaml)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    "assets/images/header.jpg",
+                    height: 120,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
                 // Judul halaman login
                 Text(
                   "Login",
