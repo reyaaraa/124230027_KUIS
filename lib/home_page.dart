@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Book Store"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.orange,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
-            color: Colors.blue.shade100,
+            color: Colors.orange,
             child: Text(
               "Selamat datang, ${widget.username} 👋",
               style: const TextStyle(fontWeight: FontWeight.bold),

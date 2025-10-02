@@ -12,7 +12,7 @@ class DetailPage extends StatelessWidget {
       backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
         title: const Text("Detail Buku"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.orange,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -64,7 +64,7 @@ class DetailPage extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
-                color: Colors.blue,
+                color: Colors.orange,
               ),
             ),
             const SizedBox(height: 8),
@@ -74,7 +74,9 @@ class DetailPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                  ),
                   onPressed: () {},
                   icon: const Icon(Icons.shopping_cart),
                   label: const Text("Beli Sekarang"),
