@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:kuis/main.dart';
 import 'login_page.dart';
 import 'book.dart';
 import 'detail_page.dart';
 
-/// Halaman utama aplikasi dengan BottomNavigationBar.
-/// - Tab 0 = Home (menampilkan daftar kendaraan dalam bentuk ListView)
-/// - Tab 1 = Profile (menampilkan halaman profil user)
+/// Halaman utama aplikasi (langsung tampil daftar kendaraan + search bar).
 class HomePage extends StatefulWidget {
   final String username;
   const HomePage({super.key, required this.username});
@@ -15,12 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // ---------------------------
-  // STATE / DATA YANG DIGUNAKAN
-  // ---------------------------
-
-  /// Menyimpan index kendaraan yang disukai.
-  /// Digunakan untuk toggle icon ❤️.
+  /// Menyimpan index kendaraan yang disukai (favorite).
   final List<int> _favorite = [];
 
   /// Controller untuk search bar (input pencarian).
@@ -29,12 +23,6 @@ class _HomePageState extends State<HomePage> {
   /// Kata kunci pencarian (diketik user).
   String _searchKeyword = "";
 
-  // ---------------------------
-  // FUNGSI PENDUKUNG
-  // ---------------------------
-
-  /// Logout dengan konfirmasi.
-  /// Jika user menekan "Iya", maka diarahkan kembali ke LoginPage.
   void _logout(BuildContext context) {
     showDialog(
       context: context,
@@ -60,68 +48,129 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  /// Toggle favorite (like).
+  void _toggleFavorite(int vehicleIndex) {
+    setState(() {
+      if (_favorite.contains(vehicleIndex)) {
+        _favorite.remove(vehicleIndex);
+      } else {
+        _favorite.add(vehicleIndex);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
-}
+    // Filter kendaraan sesuai pencarian
+    final filtered = List.generate(bookList.length, (i) => i).where((index) {
+      final v = bookList[index];
+      final keyword = _searchKeyword.toLowerCase();
+      return v.title.toLowerCase().contains(keyword) ||
+          v.author.toLowerCase().contains(keyword);
+    }).toList();
 
-/// Halaman Sampah (Trash)
-/// - Menampilkan kendaraan yang dihapus
-/// - Ada tombol Restore untuk mengembalikan kendaraan ke Home
-class TrashPage extends StatelessWidget {
-  final List<int> trashBin;
-  final List vehicleList;
-  final Function(int) onRestore;
-
-  const TrashPage({
-    super.key,
-    required this.trashBin,
-    required this.vehicleList,
-    required this.onRestore,
-  });
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sampah"),
+        title: Text("Selamat datang, ${widget.username}"),
         backgroundColor: Colors.orange,
+        actions: [
+          // Tombol logout
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: "Logout",
+            onPressed: () => _logout(context),
+          ),
+        ],
       ),
-      body: trashBin.isEmpty
-          ? const Center(child: Text("Sampah kosong"))
-          : ListView.builder(
+      body: Column(
+        children: [
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: "Cari kendaraan...",
+                prefixIcon: const Icon(Icons.search, color: Colors.orange),
+                suffixIcon: _searchKeyword.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {
+                            _searchKeyword = "";
+                          });
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              onChanged: (value) => setState(() => _searchKeyword = value),
+            ),
+          ),
+
+          // List kendaraan
+          Expanded(
+            child: ListView.builder(
               padding: const EdgeInsets.all(12),
-              itemCount: trashBin.length,
-              itemBuilder: (context, i) {
-                final vehicleIndex = trashBin[i];
-                final vehicle = vehicleList[vehicleIndex];
+              itemCount: filtered.length,
+              itemBuilder: (context, idx) {
+                final BookstoreIndex = filtered[idx];
+                final vehicle = bookList[BookstoreIndex];
+                final liked = _favorite.contains(BookstoreIndex);
 
                 return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 3,
                   child: ListTile(
                     leading: CircleAvatar(
+                      radius: 30,
                       backgroundImage: NetworkImage(vehicle.imageUrls[0]),
+                      backgroundColor: Colors.orange.shade100,
                     ),
-                    title: Text(vehicle.name),
-                    subtitle: Text(vehicle.type),
-                    trailing: TextButton(
-                      child: const Text("Restore"),
-                      onPressed: () {
-                        onRestore(vehicleIndex);
-                        Navigator.pop(context); // kembali ke Home
-                      },
+                    title: Text(
+                      Bookstore.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
+                    subtitle: Text(Bookstore.author ?? ''),
+                    trailing: IconButton(
+                      icon: Icon(
+                        liked ? Icons.favorite : Icons.favorite_border,
+                        color: liked ? Colors.red : Colors.grey,
+                      ),
+                      onPressed: () => _toggleFavorite(BookstoreIndex),
+                    ),
+                    // Klik → buka detail kendaraan
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (c) =>
+                              DetailPage(Bookstore: bookList[BookstoreIndex]),
+                        ),
+                      );
+                    },
                   ),
                 );
               },
             ),
+          ),
+        ],
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 }

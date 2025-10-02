@@ -10,6 +10,8 @@ class Bookstore extends StatelessWidget {
 
   const Bookstore({super.key});
 
+  static String? get author => null;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
