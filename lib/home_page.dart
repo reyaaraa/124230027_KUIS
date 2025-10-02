@@ -128,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                   child: ListTile(
                     leading: CircleAvatar(
                       radius: 30,
-                      backgroundImage: NetworkImage(book.imageUrl),
+                      backgroundImage: NetworkImage(book.imageUrls.first),
                       backgroundColor: Colors.grey.shade200,
                     ),
                     title: Text(

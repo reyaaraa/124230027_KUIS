@@ -23,7 +23,7 @@ class DetailPage extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
-                  book.imageUrl,
+                  book.imageUrls.first,
                   height: 250,
                   width: double.infinity,
                   fit: BoxFit.cover,
