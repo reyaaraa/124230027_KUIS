@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kuis/main.dart';
 import 'login_page.dart';
 import 'book.dart';
 import 'detail_page.dart';
@@ -14,13 +13,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  /// Menyimpan index kendaraan yang disukai (favorite).
   final List<int> _favorite = [];
-
-  /// Controller untuk search bar (input pencarian).
   final TextEditingController _searchController = TextEditingController();
-
-  /// Kata kunci pencarian (diketik user).
   String _searchKeyword = "";
 
   void _logout(BuildContext context) {
@@ -48,20 +42,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// Toggle favorite (like).
-  void _toggleFavorite(int vehicleIndex) {
+  void _toggleFavorite(int bookIndex) {
     setState(() {
-      if (_favorite.contains(vehicleIndex)) {
-        _favorite.remove(vehicleIndex);
+      if (_favorite.contains(bookIndex)) {
+        _favorite.remove(bookIndex);
       } else {
-        _favorite.add(vehicleIndex);
+        _favorite.add(bookIndex);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Filter kendaraan sesuai pencarian
     final filtered = List.generate(bookList.length, (i) => i).where((index) {
       final v = bookList[index];
       final keyword = _searchKeyword.toLowerCase();
@@ -71,10 +63,9 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Selamat datang, ${widget.username}"),
-        backgroundColor: Colors.orange,
+        title: const Text("Book Store"),
+        backgroundColor: Colors.blue,
         actions: [
-          // Tombol logout
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: "Logout",
@@ -84,22 +75,28 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
-          // Search bar
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            color: Colors.blue.shade100,
+            child: Text(
+              "Selamat datang, ${widget.username} 👋",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(12),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: "Cari Buku",
-                prefixIcon: const Icon(Icons.search, color: Colors.orange),
+                hintText: "Cari Buku...",
+                prefixIcon: const Icon(Icons.search, color: Colors.blue),
                 suffixIcon: _searchKeyword.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
                         onPressed: () {
                           _searchController.clear();
-                          setState(() {
-                            _searchKeyword = "";
-                          });
+                          setState(() => _searchKeyword = "");
                         },
                       )
                     : null,
@@ -113,16 +110,14 @@ class _HomePageState extends State<HomePage> {
               onChanged: (value) => setState(() => _searchKeyword = value),
             ),
           ),
-
-          // List kendaraan
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(12),
               itemCount: filtered.length,
               itemBuilder: (context, idx) {
-                final BookstoreList = filtered[idx];
-                final vehicle = bookList[BookstoreList];
-                final liked = _favorite.contains(BookstoreList);
+                final bookIndex = filtered[idx];
+                final book = bookList[bookIndex];
+                final liked = _favorite.contains(bookIndex);
 
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 8),
@@ -133,28 +128,26 @@ class _HomePageState extends State<HomePage> {
                   child: ListTile(
                     leading: CircleAvatar(
                       radius: 30,
-                      backgroundImage: NetworkImage(vehicle.imageUrls[0]),
-                      backgroundColor: Colors.orange.shade100,
+                      backgroundImage: NetworkImage(book.imageUrl),
+                      backgroundColor: Colors.grey.shade200,
                     ),
                     title: Text(
-                      Bookstore.title,
+                      book.title,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Text(Bookstore.author ?? ''),
+                    subtitle: Text(book.author),
                     trailing: IconButton(
                       icon: Icon(
                         liked ? Icons.favorite : Icons.favorite_border,
                         color: liked ? Colors.red : Colors.grey,
                       ),
-                      onPressed: () => _toggleFavorite(BookstoreList),
+                      onPressed: () => _toggleFavorite(bookIndex),
                     ),
-                    // Klik → buka detail kendaraan
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (c) =>
-                              DetailPage(Bookstore: bookList[BookstoreList]),
+                          builder: (c) => DetailPage(book: book),
                         ),
                       );
                     },
@@ -166,11 +159,5 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
   }
 }
